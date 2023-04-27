@@ -5,6 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.francisco.paliouras.shefu_final.data.dao.RecipeDao
+import com.francisco.paliouras.shefu_final.data.dao.ShoppingItemDao
 import com.francisco.paliouras.shefu_final.data.entities.Recipe
 
 //database annotation is looking for an abstract class
@@ -12,6 +13,8 @@ import com.francisco.paliouras.shefu_final.data.entities.Recipe
 abstract class AppDatabase: RoomDatabase() {
 
     abstract fun RecipeDao():RecipeDao
+
+    abstract fun ShoppingItemDao():ShoppingItemDao
 
     //singleton pattern for the database
     companion object {

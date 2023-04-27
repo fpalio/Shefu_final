@@ -11,11 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -27,12 +23,13 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.francisco.paliouras.shefu_final.models.RecipeViewModel
+import com.francisco.paliouras.shefu_final.models.ShoppingItemViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun MainScreen(recipeViewModel: RecipeViewModel) {
+fun MainScreen(recipeViewModel: RecipeViewModel, shoppingItemViewModel: ShoppingItemViewModel) {
     
     val scaffoldState = rememberScaffoldState(rememberDrawerState(initialValue = DrawerValue.Closed))
 
@@ -65,6 +62,7 @@ fun MainScreen(recipeViewModel: RecipeViewModel) {
                 Navigation(
                     navController = navController,
                     recipeViewModel = recipeViewModel,
+                    shoppingItemViewModel = shoppingItemViewModel,
                     updateInAdd = { newValue -> inPage = newValue}
                 )
     }//Scaffold
@@ -166,7 +164,7 @@ fun TopBar(
 @Composable
 fun Drawer(scope: CoroutineScope, scaffoldState: ScaffoldState, navController: NavController) {
     //menu items
-    var items = listOf(
+    val items = listOf(
         NavDrawerItem.Home,
         NavDrawerItem.Shopping,
         NavDrawerItem.Favorites
@@ -269,7 +267,12 @@ fun DrawerItem(item: NavDrawerItem, selected: Boolean, onItemClick: (NavDrawerIt
 
 
 @Composable
-fun Navigation(navController: NavHostController, recipeViewModel: RecipeViewModel, updateInAdd: (Boolean) -> Unit) {
+fun Navigation(
+    navController: NavHostController,
+    recipeViewModel: RecipeViewModel,
+    shoppingItemViewModel: ShoppingItemViewModel,
+    updateInAdd: (Boolean) -> Unit,
+) {
     NavHost(navController = navController, startDestination = NavDrawerItem.Home.route) {
         composable(NavDrawerItem.Home.route) {
             RecipeList(recipeViewModel, navController= navController)

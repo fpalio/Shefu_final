@@ -15,6 +15,9 @@ interface RecipeDao {
     @Query("SELECT * FROM recipe WHERE id = :id")
     fun getRecipeById(id: Int): LiveData<Recipe>
 
+    @Query("SELECT * FROM recipe WHERE isFavorite = true")
+    fun getAllFavoriteRecipes(): LiveData<List<Recipe>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertRecipe(recipe: Recipe)
 
@@ -23,4 +26,7 @@ interface RecipeDao {
 
     @Query("DELETE FROM recipe ")
     suspend fun deleteAllRecipes()
+
+    @Query("UPDATE recipe SET isFavorite = :isFavorite WHERE id = :id")
+    suspend fun updateIsFavoriteById(id: Int, isFavorite: Boolean)
 }

@@ -19,6 +19,8 @@ data class Recipe(
     val ingredients : List<Ingredient>?,
     @ColumnInfo(name= "directions")
     val directions : List<String>?,
+    @ColumnInfo(name="isFavorite")
+    val isFavorite : Boolean = false
 )
 
 data class Ingredient(

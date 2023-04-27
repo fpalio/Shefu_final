@@ -32,4 +32,8 @@ class RecipeRepository(application: Application) {
     suspend fun deleteAllRecipes(){
         recipeDao.deleteAllRecipes()
     }
+
+    suspend fun updateIsFavoriteById(id: Int, newIsFavorite: Boolean){
+        recipeDao.updateIsFavoriteById(id,newIsFavorite)
+    }
 }

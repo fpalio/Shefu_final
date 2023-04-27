@@ -3,7 +3,6 @@ package com.francisco.paliouras.shefu_final
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -18,10 +17,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusDirection.Companion.In
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -37,7 +33,7 @@ import com.francisco.paliouras.shefu_final.models.RecipeViewModel
 enum class IngredientTypes(val stringValue: String) {
     GRAMS("Grams(g)"),
     POUNDS("Pounds (lb)"),
-    MILILITERS("Mililiters(ml)"),
+    MILLILITERS("Milliliters(ml)"),
     CUPS("Cups");
 }
 
@@ -60,14 +56,13 @@ fun InsertRecipeScreen(
     // Add new states for the ingredient input fields
     var ingredientName by remember { mutableStateOf("") }
     var ingredientAmount by remember { mutableStateOf("") }
-    var ingredientAmountType by remember { mutableStateOf("") }
 
     var expanded by remember { mutableStateOf(false) }
     var selectedOption by remember { mutableStateOf(IngredientTypes.GRAMS) }
 
     //This is the navigation stack.
     val navBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentRoute = navBackStackEntry?.destination?.route
+    //val currentRoute = navBackStackEntry?.destination?.route
 
     Column(
         modifier = Modifier
@@ -100,12 +95,6 @@ fun InsertRecipeScreen(
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                 )
             }
-//            TextField(
-//                value = ingredientAmountType,
-//                onValueChange = { ingredientAmountType = it },
-//                placeholder = { Text("Ingredient Amount Type") }
-//            )
-
 
             Box(modifier = Modifier.padding(8.dp).clickable{
                 expanded = !expanded
@@ -160,7 +149,7 @@ fun InsertRecipeScreen(
                        // Clear ingredient input fields
                        ingredientName = ""
                        ingredientAmount = ""
-                       ingredientAmountType = ""
+                       selectedOption = IngredientTypes.GRAMS
 
                        //dismiss keyboard
                        keyboardController?.hide()
@@ -307,7 +296,7 @@ fun RecipeList(recipeViewModel: RecipeViewModel, navController: NavController) {
 
 @Composable
 fun RecipeInitialIcon(recipeName: String, modifier: Modifier = Modifier, shape: Shape = MaterialTheme.shapes.medium) {
-    val firstLetter = recipeName.firstOrNull()?.toUpperCase().toString()
+    val firstLetter = recipeName.firstOrNull()?.uppercaseChar().toString()
 
     Box(
         modifier = modifier
