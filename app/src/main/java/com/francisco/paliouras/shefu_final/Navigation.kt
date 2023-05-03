@@ -1,6 +1,7 @@
 package com.francisco.paliouras.shefu_final
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,10 +19,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import com.francisco.paliouras.shefu_final.models.RecipeViewModel
 import com.francisco.paliouras.shefu_final.models.ShoppingItemViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -127,38 +130,44 @@ fun TopBar(
     scope: CoroutineScope,
     scaffoldState: ScaffoldState,
     inPage: Boolean,
-    updateInPage : (Boolean)-> Unit
+    updateInPage: (Boolean) -> Unit
 ) {
-    //This is the navigation stack.
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
     val currentNavDrawerItem = getNavDrawerItemForRoute(currentRoute.toString())
-    val title = currentNavDrawerItem?.title ?: "NotFound"
+
+    val title = when {
+        currentRoute == "detail/{recipeId}" -> "Detail Screen"
+        currentNavDrawerItem != null -> currentNavDrawerItem.title
+        else -> "NotFound"
+    }
+
     TopAppBar(
         title = { Text(text = title, fontSize = 18.sp) },
         navigationIcon = {
-           if(!inPage){
-               IconButton(onClick = {
-                   scope.launch {
-                       scaffoldState.drawerState.open()
-                   }
-               }) {
-                   Icon(Icons.Filled.Menu, contentDescription = "")
-               }
-           }else{
-               IconButton(onClick = {
+            if (!inPage) {
+                IconButton(onClick = {
+                    scope.launch {
+                        scaffoldState.drawerState.open()
+                    }
+                }) {
+                    Icon(Icons.Filled.Menu, contentDescription = "")
+                }
+            } else {
+                IconButton(onClick = {
                     //this will take you back to the previous screen
-                   navController.navigateUp()
-                   updateInPage(false)
-               }) {
-                   Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-               }
-           }
+                    navController.navigateUp()
+                    updateInPage(false)
+                }) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                }
+            }
         },
         backgroundColor = MaterialTheme.colors.primary,
         contentColor = Color.White
     )
 }
+
 
 
 @Composable
@@ -174,7 +183,9 @@ fun Drawer(scope: CoroutineScope, scaffoldState: ScaffoldState, navController: N
         //Header
         Text(
             text = "Shefu.io",
-            modifier = Modifier.padding(16.dp).fillMaxWidth(),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
             fontSize = 24.sp, // Set the desired font size
             fontWeight = FontWeight.Bold, // Set the font weight to bold)
             textAlign = TextAlign.Center
@@ -275,19 +286,25 @@ fun Navigation(
 ) {
     NavHost(navController = navController, startDestination = NavDrawerItem.Home.route) {
         composable(NavDrawerItem.Home.route) {
-            RecipeList(recipeViewModel, navController= navController)
+            RecipeList(recipeViewModel, navController= navController, updateInAdd = updateInAdd)
         }
         composable(NavDrawerItem.AddRecipe.route) {
             InsertRecipeScreen(recipeViewModel, navController = navController, updateInAdd = updateInAdd)
         }
-        composable(NavDrawerItem.Details.route){
-            //TODO
+        composable(
+            "detail/{recipeId}",
+            arguments = listOf(
+                navArgument("recipeId") { type = NavType.IntType }
+            )
+        ) { backStackEntry ->
+            val recipeId = backStackEntry.arguments?.getInt("recipeId") ?: return@composable
+            DetailScreen(recipeViewModel, recipeId, navController, updateInAdd)
         }
         composable(NavDrawerItem.Favorites.route){
-            //TODO
+            FavoriteRecipeList(recipeViewModel, navController= navController, updateInAdd = updateInAdd)
         }
         composable(NavDrawerItem.Shopping.route){
-            //TODO
+            ShoppingList(vm= shoppingItemViewModel)
         }
     }
 }//Navigation
